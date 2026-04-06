@@ -1,21 +1,31 @@
-# Terraform
+# Terraform — local state and working directory (never commit)
 .terraform/
 *.tfstate
 *.tfstate.*
-*.tfvars
-*.tfvars.json
 .terraform.tfstate.lock.info
 crash.log
 crash.*.log
+
+# Variable files often contain secrets
+*.tfvars
+*.tfvars.json
+*.auto.tfvars
+*.auto.tfvars.json
+
+# Local CLI config
+.terraformrc
+terraform.rc
+
+# Saved plans
+*.tfplan
+
+# Local overrides (not for shared modules)
 override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
-.terraformrc
-terraform.rc
 
-# Keep version lock for reproducible runs (do not ignore):
-# .terraform.lock.hcl
+# Commit .terraform.lock.hcl for consistent provider versions
 
 # Secrets and keys
 *.pem
