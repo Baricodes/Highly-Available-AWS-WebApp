@@ -1,3 +1,7 @@
+# ------------------------------------------------------------------------------
+# Application load balancer
+# ------------------------------------------------------------------------------
+
 resource "aws_security_group" "alb_sg" {
   name        = "alb-sg"
   description = "Security group for application load balancer"
@@ -31,6 +35,10 @@ resource "aws_security_group" "alb_sg" {
   }
 }
 
+# ------------------------------------------------------------------------------
+# Application tier (behind ALB)
+# ------------------------------------------------------------------------------
+
 resource "aws_security_group" "app_sg" {
   name        = "app-sg"
   description = "Security group for application tier"
@@ -55,6 +63,10 @@ resource "aws_security_group" "app_sg" {
     Name = "app-sg"
   }
 }
+
+# ------------------------------------------------------------------------------
+# Database tier
+# ------------------------------------------------------------------------------
 
 resource "aws_security_group" "db_sg" {
   name        = "db-sg"

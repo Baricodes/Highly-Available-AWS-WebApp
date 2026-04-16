@@ -1,3 +1,7 @@
+# ------------------------------------------------------------------------------
+# NAT gateway elastic IPs
+# ------------------------------------------------------------------------------
+
 resource "aws_eip" "nat_a" {
   domain = "vpc"
 
@@ -17,6 +21,10 @@ resource "aws_eip" "nat_b" {
 
   depends_on = [aws_internet_gateway.webapp_igw]
 }
+
+# ------------------------------------------------------------------------------
+# NAT gateways (one per public subnet / AZ)
+# ------------------------------------------------------------------------------
 
 resource "aws_nat_gateway" "nat_a" {
   allocation_id = aws_eip.nat_a.id
