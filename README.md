@@ -1,8 +1,8 @@
 # Highly Available Web Application Platform on AWS
 
-Designed and deployed a multi-tier AWS web application platform focused on availability, scalability, and network isolation. The live environment uses a custom VPC, public and private subnet separation, an Application Load Balancer, an Auto Scaling Group across two Availability Zones, and a private PostgreSQL RDS database tier.
+Designed and deployed a multi-tier AWS web application platform focused on availability, scalability, network isolation, and repeatable infrastructure. The platform uses a custom VPC, public and private subnet separation, an internet-facing Application Load Balancer, an Auto Scaling Group across two Availability Zones, private EC2 application instances, and a private Amazon RDS database tier.
 
-**How this repository relates to that work:** The full stack was **implemented and verified first in the AWS Management Console**. **Terraform in this repo is an active, incremental effort** to codify the same architecture under `terraform/`; it does not yet cover every resource that exists in AWS (for example, the ALB, ASG, EC2 instances, and RDS instance are described below and shown in screenshots from the console deployment, while ongoing commits add and align Terraform). Screenshots document the **console-built** environment.
+The architecture was first implemented and verified in the AWS Management Console. This repository codifies the platform with Terraform under `terraform/`, while the screenshots below document the working console deployment.
 
 ## Project Goals
 
@@ -10,11 +10,12 @@ Designed and deployed a multi-tier AWS web application platform focused on avail
 - separate internet-facing, application, and database tiers
 - implement load balancing and horizontal scaling
 - protect the database inside private subnets
+- manage the infrastructure with repeatable Terraform
 - document the architecture like a real cloud engineering project
 
 ## Architecture Overview
 
-The **deployed platform** (built in the console) includes:
+The platform includes:
 
 - **Custom VPC**
 - **2 public subnets** for the load balancer and NAT gateways
@@ -25,10 +26,14 @@ The **deployed platform** (built in the console) includes:
 - **Application Load Balancer**
 - **Auto Scaling Group**
 - **EC2 application instances across 2 Availability Zones**
-- **Amazon RDS for PostgreSQL**
+- **Amazon RDS for MySQL**
 - **Security groups for ALB, app tier, and DB tier**
+- **ACM certificate with DNS validation through Route 53**
+- **CloudWatch alarms for compute, load balancer, and database health**
+- **S3 bucket for assets, logs, backups, or deployment artifacts**
+- **IAM role and instance profile for EC2 access to SSM, CloudWatch, and S3**
 
-**Terraform in this repository (in progress):** VPC, subnets, internet gateway, NAT gateways, route tables, security groups, and an RDS DB subnet group—**us-east-1**, with private DB subnets in **us-east-1b** and **us-east-1c**. Additional resources will be added over time to match the console stack.
+Terraform is configured for **us-east-1** and deploys resources across **us-east-1b** and **us-east-1c**.
 
 ## Architecture Highlights
 
@@ -37,10 +42,54 @@ The **deployed platform** (built in the console) includes:
 - The **application tier runs in private subnets**, reducing direct internet exposure.
 - The **database tier is isolated in private DB subnets** and only accepts traffic from the application tier.
 - **NAT Gateways** provide outbound internet access for private application instances without making them public.
+- **HTTPS support** is configured with ACM certificate validation through Route 53.
+- **CloudWatch alarms** monitor ASG CPU, unhealthy ALB targets, RDS CPU, free storage, and database connections.
+
+## Terraform Implementation
+
+Terraform under `terraform/` provisions the core infrastructure:
+
+- VPC, internet gateway, public subnets, private application subnets, and private database subnets
+- public, private application, and private database route tables
+- two NAT Gateways, one per public subnet / Availability Zone
+- security groups for the ALB, application tier, and database tier
+- Application Load Balancer with HTTP and HTTPS listeners
+- target group with HTTP health checks
+- EC2 launch template using Amazon Linux 2023 and Apache HTTP Server
+- Auto Scaling Group with CPU target tracking
+- private Multi-AZ Amazon RDS MySQL instance
+- ACM certificate and Route 53 DNS validation records
+- CloudWatch metric alarms
+- encrypted, private S3 bucket with versioning
+- EC2 IAM role and instance profile for SSM, CloudWatch, and S3 read-only access
+
+### Required Terraform Variables
+
+Set these values through `TF_VAR_*` environment variables or a local `.tfvars` file that is not committed:
+
+- `db_master_username`
+- `db_master_password`
+- `app_domain_name`
+- `route53_zone_id`
+- `s3_assets_bucket_name`
+
+Optional alarm thresholds and notification actions are also available in `terraform/variables.tf`.
+
+### Terraform Commands
+
+From the `terraform/` directory:
+
+```bash
+terraform init
+terraform fmt
+terraform validate
+terraform plan
+terraform apply
+```
 
 ## Screenshots
 
-These images are from the **AWS console** deployment described above (not generated by Terraform alone).
+These images are from the **AWS console** deployment described above.
 
 ### VPC Resource Map
 Shows the custom VPC layout, subnet segmentation, route tables, NAT gateways, and internet connectivity design.
@@ -87,10 +136,10 @@ The database subnet group spans two private database subnets across separate Ava
 
 ![DB Subnet Group](./images/db-subnet-group.png)
 
-### Amazon RDS PostgreSQL
-The database tier runs on Amazon RDS for PostgreSQL inside the private database layer.
+### Amazon RDS Database
+The database tier runs on Amazon RDS inside the private database layer.
 
-![RDS PostgreSQL](./images/rds-instance.png)
+![RDS Database](./images/rds-instance.png)
 
 ### Running Application
 The application is successfully served through the Application Load Balancer and displays backend host details.
@@ -100,7 +149,7 @@ The application is successfully served through the Application Load Balancer and
 ## Key Design Decisions
 
 ### 1. Public and private subnet separation
-I separated public-facing and internal resources to better reflect a production-style AWS deployment. The load balancer lives in public subnets, while the application and database tiers are isolated in private subnets.
+Public-facing and internal resources are separated to reflect a production-style AWS deployment. The load balancer lives in public subnets, while the application and database tiers are isolated in private subnets.
 
 ### 2. Load balancer in front of the application tier
 The Application Load Balancer provides a single entry point for users and distributes traffic to healthy EC2 instances. This improves both availability and operational flexibility.
@@ -109,7 +158,7 @@ The Application Load Balancer provides a single entry point for users and distri
 Running the application tier across two AZs reduces the risk of a single point of failure and creates a stronger high-availability design.
 
 ### 4. Private database tier
-The PostgreSQL database is not directly exposed to the internet. Access is restricted through security group rules so only the application tier can communicate with it.
+The MySQL database is not directly exposed to the internet. Access is restricted through security group rules so only the application tier can communicate with it.
 
 ### 5. NAT Gateways for outbound access
 Private instances still need outbound access for updates and package installation. NAT Gateways allow this without assigning public IP addresses to the application servers.
@@ -126,8 +175,13 @@ Private instances still need outbound access for updates and package installatio
 - Auto Scaling Group deployment
 - EC2 launch template usage
 - Amazon RDS subnet group design
+- Amazon RDS Multi-AZ database deployment
+- ACM certificate validation with Route 53
+- CloudWatch alarm configuration
+- S3 bucket hardening with encryption, versioning, and public access blocks
+- IAM roles and instance profiles for EC2
 - production-style cloud architecture documentation
-- Infrastructure as Code with **Terraform** (ongoing—parity with the console stack)
+- Infrastructure as Code with **Terraform**
 
 ## What I Learned
 
@@ -137,15 +191,5 @@ This project helped reinforce how AWS infrastructure components work together in
 - how ALB target groups and health checks affect application availability
 - how Auto Scaling improves resilience beyond a fixed EC2 deployment
 - how to structure a multi-tier architecture that is easier to secure and explain
+- how to use Terraform to turn a console-built architecture into repeatable infrastructure
 - how to document infrastructure projects in a way that is useful to hiring managers
-- how to translate a working console deployment into **repeatable Terraform** over time
-
-## Future Improvements
-
-- **Extend Terraform** to cover the ALB, ASG, EC2, RDS instance, and related resources (optionally using **import** where resources already exist in AWS)
-- add **HTTPS with ACM and Route 53**
-- confirm and enable **RDS Multi-AZ** if expanding this environment
-- add **CloudWatch alarms and dashboards**
-- use **AWS Systems Manager Session Manager** instead of SSH
-- store application secrets in **AWS Secrets Manager or Parameter Store**
-- add a **CI/CD pipeline** for Terraform and application releases
