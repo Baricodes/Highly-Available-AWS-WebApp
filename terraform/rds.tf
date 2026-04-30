@@ -3,11 +3,11 @@
 # ------------------------------------------------------------------------------
 
 resource "aws_db_subnet_group" "webapp" {
-  name       = "ha-webapp-db-subnet-group"
+  name       = "webapp-db-subnet-group"
   subnet_ids = [aws_subnet.private_db_a.id, aws_subnet.private_db_b.id]
 
   tags = {
-    Name = "ha-webapp-db-subnet-group"
+    Name = "webapp-db-subnet-group"
   }
 }
 
@@ -16,7 +16,7 @@ resource "aws_db_subnet_group" "webapp" {
 # ------------------------------------------------------------------------------
 
 resource "aws_db_instance" "webapp" {
-  identifier     = "ha-webapp-db"
+  identifier     = "webapp-db"
   engine         = "mysql"
   instance_class = "db.t3.micro"
 
@@ -36,6 +36,6 @@ resource "aws_db_instance" "webapp" {
   skip_final_snapshot = true
 
   tags = {
-    Name = "ha-webapp-db"
+    Name = "webapp-db"
   }
 }

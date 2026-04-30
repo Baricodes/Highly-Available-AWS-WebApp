@@ -15,6 +15,10 @@ The architecture was first implemented and verified in the AWS Management Consol
 
 ## Architecture Overview
 
+The diagram below shows the full AWS deployment, including the VPC, public and private subnet layout, load balancer, Auto Scaling group, RDS database tier, NAT gateways, Route 53, ACM, S3, IAM, and CloudWatch monitoring.
+
+![Highly Available AWS Web Application Architecture](./images/aws_architecture.png)
+
 The platform includes:
 
 - **Custom VPC**
@@ -86,6 +90,10 @@ terraform validate
 terraform plan
 terraform apply
 ```
+
+### Deployment Challenge: ACM Certificate Issuance
+
+One of the main issues I faced during this project was the amount of time it took for AWS Certificate Manager to issue the TLS certificate. Even with DNS validation configured through Route 53, certificate provisioning introduced a waiting period before the HTTPS listener could be fully completed and tested.
 
 ## Screenshots
 

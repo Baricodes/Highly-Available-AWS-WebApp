@@ -11,7 +11,7 @@ resource "aws_acm_certificate" "webapp" {
   }
 
   tags = {
-    Name = "ha-webapp-acm-certificate"
+    Name = "webapp-acm-certificate"
   }
 }
 

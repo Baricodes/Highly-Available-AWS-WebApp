@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------------------
 
 resource "aws_cloudwatch_metric_alarm" "asg_cpu_high" {
-  alarm_name          = "ha-webapp-asg-cpu-high"
+  alarm_name          = "webapp-asg-cpu-high"
   alarm_description   = "Average CPU utilization for the web app Auto Scaling group is high"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
@@ -22,7 +22,7 @@ resource "aws_cloudwatch_metric_alarm" "asg_cpu_high" {
   }
 
   tags = {
-    Name = "ha-webapp-asg-cpu-high"
+    Name = "webapp-asg-cpu-high"
   }
 }
 
@@ -31,7 +31,7 @@ resource "aws_cloudwatch_metric_alarm" "asg_cpu_high" {
 # ------------------------------------------------------------------------------
 
 resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_hosts" {
-  alarm_name          = "ha-webapp-alb-unhealthy-hosts"
+  alarm_name          = "webapp-alb-unhealthy-hosts"
   alarm_description   = "One or more targets behind the web app ALB are unhealthy"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
@@ -51,7 +51,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_hosts" {
   }
 
   tags = {
-    Name = "ha-webapp-alb-unhealthy-hosts"
+    Name = "webapp-alb-unhealthy-hosts"
   }
 }
 
@@ -60,7 +60,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_hosts" {
 # ------------------------------------------------------------------------------
 
 resource "aws_cloudwatch_metric_alarm" "rds_cpu_high" {
-  alarm_name          = "ha-webapp-rds-cpu-high"
+  alarm_name          = "webapp-rds-cpu-high"
   alarm_description   = "CPU utilization for the web app RDS instance is high"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
@@ -79,12 +79,12 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu_high" {
   }
 
   tags = {
-    Name = "ha-webapp-rds-cpu-high"
+    Name = "webapp-rds-cpu-high"
   }
 }
 
 resource "aws_cloudwatch_metric_alarm" "rds_free_storage_low" {
-  alarm_name          = "ha-webapp-rds-free-storage-low"
+  alarm_name          = "webapp-rds-free-storage-low"
   alarm_description   = "Free storage space for the web app RDS instance is low"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = 1
@@ -103,12 +103,12 @@ resource "aws_cloudwatch_metric_alarm" "rds_free_storage_low" {
   }
 
   tags = {
-    Name = "ha-webapp-rds-free-storage-low"
+    Name = "webapp-rds-free-storage-low"
   }
 }
 
 resource "aws_cloudwatch_metric_alarm" "rds_database_connections_high" {
-  alarm_name          = "ha-webapp-rds-database-connections-high"
+  alarm_name          = "webapp-rds-database-connections-high"
   alarm_description   = "Database connections for the web app RDS instance are high"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
@@ -127,6 +127,6 @@ resource "aws_cloudwatch_metric_alarm" "rds_database_connections_high" {
   }
 
   tags = {
-    Name = "ha-webapp-rds-database-connections-high"
+    Name = "webapp-rds-database-connections-high"
   }
 }

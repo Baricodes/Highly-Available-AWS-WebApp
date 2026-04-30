@@ -32,7 +32,7 @@ data "aws_ami" "amazon_linux_2023" {
 # ------------------------------------------------------------------------------
 
 resource "aws_launch_template" "webapp" {
-  name        = "ha-webapp-launch-template"
+  name        = "webapp-launch-template"
   description = "Launch template for the highly available web app instances"
 
   image_id      = data.aws_ami.amazon_linux_2023.id
@@ -61,7 +61,7 @@ resource "aws_launch_template" "webapp" {
     resource_type = "instance"
 
     tags = {
-      Name = "ha-webapp-instance"
+      Name = "webapp-instance"
     }
   }
 
@@ -69,11 +69,11 @@ resource "aws_launch_template" "webapp" {
     resource_type = "volume"
 
     tags = {
-      Name = "ha-webapp-volume"
+      Name = "webapp-volume"
     }
   }
 
   tags = {
-    Name = "ha-webapp-launch-template"
+    Name = "webapp-launch-template"
   }
 }

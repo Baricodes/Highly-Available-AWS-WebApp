@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------------------
 
 resource "aws_autoscaling_group" "webapp" {
-  name = "ha-webapp-asg"
+  name = "webapp-asg"
 
   min_size         = 2
   max_size         = 4
@@ -25,7 +25,7 @@ resource "aws_autoscaling_group" "webapp" {
 
   tag {
     key                 = "Name"
-    value               = "ha-webapp-asg-instance"
+    value               = "webapp-asg-instance"
     propagate_at_launch = true
   }
 
@@ -39,7 +39,7 @@ resource "aws_autoscaling_group" "webapp" {
 # ------------------------------------------------------------------------------
 
 resource "aws_autoscaling_policy" "webapp_cpu" {
-  name                   = "ha-webapp-cpu-target-tracking"
+  name                   = "webapp-cpu-target-tracking"
   autoscaling_group_name = aws_autoscaling_group.webapp.name
   policy_type            = "TargetTrackingScaling"
 

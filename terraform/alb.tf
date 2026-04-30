@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------------------
 
 resource "aws_lb" "webapp" {
-  name               = "ha-webapp-alb"
+  name               = "webapp-alb"
   internal           = false
   load_balancer_type = "application"
   ip_address_type    = "ipv4"
@@ -14,7 +14,7 @@ resource "aws_lb" "webapp" {
   ]
 
   tags = {
-    Name = "ha-webapp-alb"
+    Name = "webapp-alb"
   }
 }
 

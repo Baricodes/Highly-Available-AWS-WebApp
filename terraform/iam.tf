@@ -14,11 +14,11 @@ data "aws_iam_policy_document" "ec2_assume_role" {
 }
 
 resource "aws_iam_role" "ec2_role" {
-  name               = "ha-webapp-ec2-role"
+  name               = "webapp-ec2-role"
   assume_role_policy = data.aws_iam_policy_document.ec2_assume_role.json
 
   tags = {
-    Name = "ha-webapp-ec2-role"
+    Name = "webapp-ec2-role"
   }
 }
 
@@ -38,10 +38,10 @@ resource "aws_iam_role_policy_attachment" "s3_read_only_access" {
 }
 
 resource "aws_iam_instance_profile" "ec2_profile" {
-  name = "ha-webapp-ec2-profile"
+  name = "webapp-ec2-profile"
   role = aws_iam_role.ec2_role.name
 
   tags = {
-    Name = "ha-webapp-ec2-profile"
+    Name = "webapp-ec2-profile"
   }
 }
